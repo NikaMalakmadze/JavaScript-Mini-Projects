@@ -1,0 +1,30 @@
+
+html, body {
+    width: 500px;
+    height: 100px;
+    margin: auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 10px;
+    color: rgb(21, 18, 18);
+    background-color: antiquewhite;
+    margin-top: 20px;
+}
+
+.title{
+    border: 3px solid gray;
+    padding: 5px;
+    padding-left: 10px;
+    background-color: rgb(246, 213, 170);
+    cursor: pointer;
+}
+
+.box {
+    border: 3px solid gray;
+    background-color: rgb(141, 141, 240);
+    padding: 20px;
+    font-weight: 700;
+}
+
+.hidden {
+    display: none;
+}
