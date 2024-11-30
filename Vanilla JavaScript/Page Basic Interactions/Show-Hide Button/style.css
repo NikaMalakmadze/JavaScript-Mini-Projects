@@ -1,0 +1,39 @@
+
+html, body {
+    width: 500px;
+    margin: auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: rgb(21, 18, 18);
+    background-color: antiquewhite;
+}
+
+.title{
+    margin-top: 100px;
+    border: 3px solid gray;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: rgb(246, 213, 170);
+}
+
+.box {
+    margin-top: 20px;
+    border: 3px solid gray;
+    background-color: rgb(141, 141, 240);
+    padding: 20px;
+    font-weight: 700;
+    border-radius: 20px;
+}
+
+.btn {
+    cursor: pointer;
+    width: 80px;
+    height: 40px;
+    font-size: x-large;
+    border: 2px solid gray;
+    border-radius: 10px;
+    background-color: rgb(141, 141, 240);
+}
+
+.hidden {
+    display: none;
+}
