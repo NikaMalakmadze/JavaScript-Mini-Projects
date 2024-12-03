@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Modal Windows</title>
+</head>
+
+<body>
+  <h1>Modal Windows</h1>
+
+  <div class="buttons">
+    <button class="btn" data-modal-button="modal-1">Open Modal Window 1</button>
+    <button class="btn" data-modal-button="modal-2">Open Modal Window 2</button>
+  </div>
+
+  <div id="modal-1" class="fade-block hidden" data-modal>
+    <div class="card-block">
+      <div class="card">
+        <div class="card-title">
+          <h2>Modal Window 1</h2>
+        </div>
+        <div class="card-content">
+          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Optio dolorem quis, eveniet nesciunt molestias
+            porro. Deleniti suscipit hic aliquam explicabo necessitatibus similique minus sapiente laborum fugit
+            assumenda. Odit, vitae saepe.</p>
+          <button class="btn" data-modal-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-2" class="fade-block hidden" data-modal>
+    <div class="card-block">
+      <div class="card">
+        <div class="card-title">
+          <h2>Modal Window 2</h2>
+        </div>
+        <div class="card-content">
+          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi illo, quas expedita nemo earum quaerat
+            dolor rem, veniam maiores aut amet maxime pariatur inventore cumque! Odit quam itaque laboriosam quidem!</p>
+          <button class="btn" data-modal-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
