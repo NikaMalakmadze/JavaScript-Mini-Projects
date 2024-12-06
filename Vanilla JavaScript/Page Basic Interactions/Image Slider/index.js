@@ -4,6 +4,7 @@ const slider = document.querySelector('#slider');
 const sliderImages = Array.from(slider.getElementsByTagName('img'));
 const buttonNext = document.querySelector('#btnNext'); 
 const buttonPrev = document.querySelector('#btnPrev');
+const number = document.querySelector('#num');
 
 sliderImages.forEach(function(image , index){
 
@@ -31,9 +32,11 @@ sliderImages.forEach(function(image , index){
         const nextImage = document.querySelector(`[data-index='${nextImageIndex}']`);
         
         // show next slide and make it active
-        number.innerHTML = nextImageIndex !== 0 ? nextImageIndex : 1;
         nextImage.classList.remove('hidden');
-        nextImage.setAttribute('data-active', '');
+        //assigning nomer of image as data-active attribute value
+        nextImage.setAttribute('data-active', `${nextImageIndex + 1}`);
+        //assign number of next image to the 'nomer label' using data-active attribute value
+        number.innerHTML = nextImage.dataset.active;
     })
 })
 
@@ -63,7 +66,10 @@ function showNextSlide(direction) {
 
      // show next slide and make it active
      nextSlide.classList.remove('hidden');
-     nextSlide.setAttribute('data-active' , '');
+     //assigning nomer of image as data-active attribute value
+     nextSlide.setAttribute('data-active', `${nextSlideIndex + 1}`);
+     //assign number of next image to the 'nomer label' using data-active attribute value
+     number.innerHTML = nextSlide.dataset.active;
 }
 
 //add function when clicked on next button
