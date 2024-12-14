@@ -1,0 +1,59 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #ffffff
+}
+
+.kanit-bold {
+  font-family: "Kanit", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.container h2 {
+  background-color: rgb(236, 231, 231);
+  padding: 20px;
+  border: 5px solid rgb(201, 199, 196);
+  border-radius: 10px;
+  color: rgb(53, 53, 53);
+  font-size: 32px;
+}
+
+.btn {
+  background-color: rgb(236, 231, 231);
+  padding: 10px;
+  border: 3px solid rgb(201, 199, 196);
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover{
+  background-color: rgb(236, 231, 231);
+  border: 5px solid rgb(201, 199, 196);
+  box-shadow: 5px 5px 5px #66666680;
+  transition: all 0.2s ease-in;
+}
+
+.hex {
+  font-style: italic;
+}
+
+.hex:hover {
+  text-shadow: 3px 3px 3px #42404080;
+  transition: all 0.18s ease-in;
+}
