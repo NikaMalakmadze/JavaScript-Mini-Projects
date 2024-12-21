@@ -1,0 +1,48 @@
+
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: #d1d1c8;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter {
+  display: flex;
+  height: 80px;
+  border: 3px solid #353534;
+  border-radius: 5px;
+}
+
+.counter button {
+  width: 80px;
+  background: #ededea;
+  border: none;
+  outline: none;
+  font-size: 40px;
+  cursor: pointer;
+}
+
+.counter input {
+  width: 120px;
+  background: #ededea;
+  border: none;
+  outline: none;
+  font-size: 25px;
+  border-left: 3px solid #353534;
+  border-right: 3px solid #353534;
+  text-align: center;
+  font-weight: 800;
+}
+
+.counter button:active {
+  background: #99c6e9;
+  transition: all 0.1s ease-in-out;
+}
