@@ -1,0 +1,21 @@
+
+.footer {
+    position: absolute;
+    bottom: 0vh;
+
+    width: 100vw;
+
+    padding: 30px 0px;
+
+    background-color: cornflowerblue;
+
+    &__title {
+        width: fit-content;
+
+        padding: 10px;
+
+        background-color: darkcyan;
+
+        cursor: pointer;
+    }
+}
