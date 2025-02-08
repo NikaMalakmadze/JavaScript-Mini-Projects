@@ -61,14 +61,14 @@ function scssDev() {
 }
 
 function imagesDev() {
-    return src('./src/images/**/*')
+    return src('./src/images/**/*', { encoding: false })
             .pipe(changed('./build/img/'))
             .pipe(imagemin({ verbose: true }))
             .pipe(dest('./build/img/'))
 }
 
 function fontsDev() {
-    return src('./src/fonts/**/*')
+    return src('./src/fonts/**/*.{woff,woff2,ttf,otf,eot}', { encoding: false })
             .pipe(changed('./build/fonts/'))
             .pipe(dest('./build/fonts/'))
 }

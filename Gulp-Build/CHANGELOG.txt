@@ -1,0 +1,7 @@
+
+Here You can see CHANGELOGS:
+
+    V1.0.1 BUG FIXES:
+        DEV And DOCS Modes:
+        * fixed bug with images encoding
+        * fixed bug with fonts encoding

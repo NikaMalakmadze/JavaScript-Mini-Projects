@@ -74,7 +74,7 @@ function scssDocs() {
 }
 
 function imagesDocs() {
-    return src('./src/images/**/*')
+    return src('./src/images/**/*', { encoding: false })
             .pipe(changed('./docs/img/'))
             .pipe(webp())
             .pipe(dest('./docs/img/'))
@@ -86,7 +86,7 @@ function imagesDocs() {
 }
 
 function fontsDocs() {
-    return src('./src/fonts/**/*')
+    return src('./src/fonts/**/*.{woff,woff2,ttf,otf,eot}', { encoding: false })
             .pipe(changed('./docs/fonts/'))
             .pipe(dest('./docs/fonts/'))
 }
