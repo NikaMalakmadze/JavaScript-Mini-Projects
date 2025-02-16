@@ -32,6 +32,12 @@ const babel        = require('gulp-babel');
 // IMAGES
 const imagemin     = require('gulp-imagemin');
 const webp         = require('gulp-webp').default;
+const avif         = require('gulp-avif');
+
+// FONTS
+
+const fonter       = require('gulp-fonter');
+const ttf2woff2    = require('gulp-ttf2woff2');
 
 const plumberNotify = (name) => {
     return {
@@ -79,15 +85,26 @@ function imagesDocs() {
             .pipe(webp())
             .pipe(dest('./docs/img/'))
 
-            .pipe(src('./src/images/**/*'))
+            .pipe(src('./src/images/**/*'), { encoding: false })
             .pipe(changed('./docs/img/'))
             .pipe(imagemin({ verbose: true }))
+            .pipe(dest('./docs/img/'))
+
+            .pipe(src('./src/images/**/*', { encoding: false }))
+            .pipe(changed('./docs/img/'))
+            .pipe(avif({ quality: 50 })) 
             .pipe(dest('./docs/img/'))
 }
 
 function fontsDocs() {
     return src('./src/fonts/**/*.{woff,woff2,ttf,otf,eot}', { encoding: false })
             .pipe(changed('./docs/fonts/'))
+            .pipe(fonter({ formats: ["ttf", "woff", 'eot'] }))
+            .pipe(dest('./docs/fonts/'))
+
+            .pipe(src('./src/fonts/**/*.{woff,woff2,ttf,otf,eot}', { encoding: false }))
+            .pipe(changed('./docs/fonts/'))
+            .pipe(ttf2woff2())
             .pipe(dest('./docs/fonts/'))
 }
 

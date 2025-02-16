@@ -5,3 +5,8 @@ Here You can see CHANGELOGS:
         DEV And DOCS Modes:
         * fixed bug with images encoding
         * fixed bug with fonts encoding
+    
+    V1.0.2 IMPROVED FONTS AND IMAGES TASKS:
+        DOCS Modes:
+            * added gulp-fonter and gulp-ttf2woff2 to convert fonts into different formats
+            * added gulp-avif to convert images to avif format 
