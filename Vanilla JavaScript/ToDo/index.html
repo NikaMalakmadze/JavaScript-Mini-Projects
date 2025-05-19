@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDoTasks</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>ToDoTasks</h1>
+        <button id="theme-toggle" title="Toggle Theme">🌙</button>
+      </header>
+
+      <form class="add-task" id="form">
+        <input
+          type="text"
+          id="task-input"
+          placeholder="Add a new task..."
+          required
+        />
+        <input type="date" id="due-date" required />
+        <button id="add-task-btn">➕</button>
+      </form>
+
+      <section class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="active">Active</button>
+        <button class="filter" data-filter="completed">Completed</button>
+      </section>
+
+      <ul id="task-list" class="task-list">
+        <div class="empty-card" id="no-tasks">
+          <div class="empty-illustration">📦</div>
+          <h2 class="empty-title">No tasks yet!</h2>
+          <p class="empty-text">Add something to organize your day.</p>
+        </div>
+        <!-- Tasks will be dynamically inserted here -->
+      </ul>
+
+      <footer>
+        <p id="task-stats">Completed: 0 / 0</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

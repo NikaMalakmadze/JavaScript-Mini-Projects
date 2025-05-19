@@ -1,0 +1,293 @@
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+:root {
+  --bg: #ffffff;
+  --text: #111;
+  --card: #f9f9f9;
+  --accent: #3b82f6;
+  --completed: #10b981;
+  --warning: #f59e0b;
+  --urgent: #ef4444;
+  --neutral: #6b7280;
+}
+
+.dark {
+  --bg: #1f2937;
+  --text: #f3f4f6;
+  --card: #374151;
+}
+
+/* Utility */
+
+.hidden {
+  display: none;
+}
+
+/* Layout */
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+#theme-toggle {
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Add Task */
+.add-task {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.add-task input[type='text'],
+.add-task input[type='date'] {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+}
+
+#add-task-btn {
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.filter.active,
+.filter:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Task List */
+.task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem;
+  background: var(--card);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.task-left input[type='checkbox'] {
+  transform: scale(1.2);
+}
+
+.task-text {
+  font-size: 1rem;
+}
+
+.task-date {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  font-weight: 600;
+}
+
+.task-date.neutral {
+  background: #e5e7eb;
+  color: var(--neutral);
+}
+.task-date.warning {
+  background: #fef3c7;
+  color: var(--warning);
+}
+.task-date.urgent {
+  background: #fee2e2;
+  color: var(--urgent);
+}
+.task-date.done {
+  background: #d1fae5;
+  color: var(--completed);
+}
+
+.task-actions button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Footer */
+footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--neutral);
+}
+
+/* Task */
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s;
+}
+
+.task-left {
+  padding-left: 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.task-text {
+  font-size: 1rem;
+  word-break: break-word;
+  color: var(--text);
+}
+
+.task-text.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.task-check {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.task-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.task-date {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.task-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  transition: transform 0.2s;
+}
+
+.task-actions button:hover {
+  transform: scale(1.1);
+}
+
+/* Optional: hover feedback */
+.task-item:hover {
+  background: rgba(59, 130, 246, 0.05); /* subtle blue hover */
+}
+
+/* No Tasks Card */
+
+.empty-card {
+  background: var(--card);
+  border-radius: 16px;
+  text-align: center;
+  padding: 3rem 1rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  transition: background 0.3s, color 0.3s;
+}
+
+.empty-illustration {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.empty-text {
+  font-size: 0.95rem;
+  color: var(--neutral);
+}
+
+/* Cute float animation */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
