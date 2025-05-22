@@ -35,6 +35,13 @@ const inputDueDate = document.querySelector('#due-date');
 
 const addTaskBtn = document.querySelector('#add-task-btn');
 
+// theme button
+const themeBtn = document.querySelector('#theme-toggle');
+
+// filter buttons
+const filterSection = document.querySelector('.filters');
+const filterBtns = document.querySelectorAll('.filter');
+
 // app variables and event listeners
 
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
@@ -43,7 +50,19 @@ let tasks = []; // keep all task objects in a list
 
 let completedCount = JSON.parse(localStorage.getItem('compledetCount')) ?? 0; // variable to track amount of completed tasks
 
+let theme;
+if (localStorage.getItem('theme') === 'true') {
+  document.querySelector('body').classList.add('dark');
+  themeBtn.innerHTML = '🌞';
+  theme = true;
+} else {
+  theme = false;
+}
+
 // get tasks from local storage if they are saved in local storage and render them
+
+let filter = localStorage.getItem('filter') ?? 'all';
+
 if (localStorage.getItem('tasks')) {
   tasks = JSON.parse(localStorage.getItem('tasks'));
   tasks.forEach(task => renderTask(task));
@@ -52,8 +71,16 @@ if (localStorage.getItem('tasks')) {
 let editingTask = false; // needed for form to decide whenever it has to add new task or change exsisting one
 
 renderNoTasks();
+activeFilterBtn();
+
+tasksList.innerHTML = '';
+filterTasks(filter);
 
 form.addEventListener('submit', addTask);
+
+filterSection.addEventListener('click', filterTasks);
+
+themeBtn.addEventListener('click', toggleTheme);
 
 tasksList.addEventListener('click', deleteTask);
 
@@ -213,7 +240,7 @@ function editTask(event) {
 
 function renderNoTasks() {
   // hide No-Tasks card if there is at least one task in tasks list
-  if (tasks.length >= 1) {
+  if (tasksList.children.length >= 1) {
     noTasks.classList.add('hidden');
   } else {
     noTasks.classList.remove('hidden'); // show it if no tasks
@@ -296,7 +323,55 @@ function dueDateClass(dueDate) {
 
 function saveToLocalStorage() {
   // save app variables in local storage
+  localStorage.setItem('filter', filter);
+  localStorage.setItem('theme', JSON.stringify(theme));
   localStorage.setItem('idHash', JSON.stringify(idHash));
   localStorage.setItem('tasks', JSON.stringify(tasks));
   localStorage.setItem('compledetCount', JSON.stringify(completedCount));
+}
+
+function toggleTheme() {
+  if (themeBtn.innerHTML === '🌞') {
+    themeBtn.innerHTML = '🌙';
+  } else {
+    themeBtn.innerHTML = '🌞';
+  }
+
+  document.querySelector('body').classList.toggle('dark');
+
+  theme = !theme;
+  saveToLocalStorage();
+}
+
+function activeFilterBtn() {
+  const filterBtn = document.querySelector(`button[data-filter="${filter}"`);
+  filterBtn.classList.add('active');
+
+  filterBtns.forEach(filterBtn =>
+    filterBtn.addEventListener('click', function () {
+      filterBtns.forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      filterBtn.classList.add('active');
+
+      tasksList.innerHTML = '';
+
+      filter = filterBtn.dataset.filter;
+
+      filterTasks(filter);
+      renderNoTasks();
+      saveToLocalStorage();
+    })
+  );
+}
+
+function filterTasks(currentFilter) {
+  const filteredTasks = tasks.filter(task => {
+    if (currentFilter === 'active') return !task.done;
+    if (currentFilter === 'completed') return task.done;
+    if (currentFilter === 'all') return true; // "all"
+  });
+
+  filteredTasks.forEach(filteredTask => renderTask(filteredTask));
 }
