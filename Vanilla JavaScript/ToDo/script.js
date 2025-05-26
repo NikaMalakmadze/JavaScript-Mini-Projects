@@ -2,10 +2,10 @@
 
 // helper/utility variables
 
-const chars =
+const CHARS =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
 
-const months = [
+const MONTHS = [
   'January',
   'February',
   'March',
@@ -22,71 +22,69 @@ const months = [
 
 // find and get needed elements
 
-// task related staff
 const tasksList = document.querySelector('#task-list');
 const noTasks = document.querySelector('#no-tasks');
-
 const taskStats = document.querySelector('#task-stats');
-
-// form and inputs
 const form = document.querySelector('#form');
 const inputText = document.querySelector('#task-input');
 const inputDueDate = document.querySelector('#due-date');
-
 const addTaskBtn = document.querySelector('#add-task-btn');
-
-// theme button
 const themeBtn = document.querySelector('#theme-toggle');
-
-// filter buttons
 const filterSection = document.querySelector('.filters');
 const filterBtns = document.querySelectorAll('.filter');
 
-// app variables and event listeners
-
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
+let filter = sessionStorage.getItem('filter') ?? 'all';
 
 let tasks = []; // keep all task objects in a list
-
-let completedCount = JSON.parse(localStorage.getItem('compledetCount')) ?? 0; // variable to track amount of completed tasks
-
-let theme;
-if (localStorage.getItem('theme') === 'true') {
-  document.querySelector('body').classList.add('dark');
-  themeBtn.innerHTML = '🌞';
-  theme = true;
-} else {
-  theme = false;
-}
-
-// get tasks from local storage if they are saved in local storage and render them
-
-let filter = localStorage.getItem('filter') ?? 'all';
-
-if (localStorage.getItem('tasks')) {
-  tasks = JSON.parse(localStorage.getItem('tasks'));
-  tasks.forEach(task => renderTask(task));
-}
-
+let completedCount = 0; // variable to track amount of completed tasks
 let editingTask = false; // needed for form to decide whenever it has to add new task or change exsisting one
+let theme;
 
-renderNoTasks();
-activeFilterBtn();
+initApp();
+addEvenetListeners();
 
-tasksList.innerHTML = '';
-filterTasks(filter);
+function initApp() {
+  if (localStorage.getItem('theme') === 'true') {
+    document.querySelector('body').classList.add('dark');
+    themeBtn.innerHTML = '🌞';
+    theme = true;
+  } else {
+    theme = false;
+  }
 
-form.addEventListener('submit', addTask);
+  if (localStorage.getItem('tasks')) {
+    tasks = JSON.parse(localStorage.getItem('tasks'));
+    completedCount = tasks.filter(task => task.done).length;
+  }
 
-filterSection.addEventListener('click', filterTasks);
+  tasksList.innerHTML = '';
+  activeFilterBtn();
+  filterTasks(filter);
+}
 
-themeBtn.addEventListener('click', toggleTheme);
+function addEvenetListeners() {
+  form.addEventListener('submit', addTask);
 
-tasksList.addEventListener('click', deleteTask);
+  filterSection.addEventListener('click', filterTasks);
 
-tasksList.addEventListener('click', completedTask);
+  themeBtn.addEventListener('click', toggleTheme);
 
-tasksList.addEventListener('click', editTask);
+  tasksList.addEventListener('click', handleClick);
+}
+
+function handleClick(event) {
+  const taskElement = event.target.closest('.task-item');
+  if (!taskElement) return;
+
+  if (event.target.title === 'Delete') {
+    deleteTask(taskElement);
+  } else if (event.target.title === 'Edit') {
+    editTask(taskElement);
+  } else if (event.target.dataset.checkbox !== undefined) {
+    completedTask(taskElement);
+  }
+}
 
 function addTask(event) {
   if (editingTask) return; // dont add new task if user is editing task
@@ -116,24 +114,22 @@ function addTask(event) {
 
   tasks.push(taskItem); // save task object in list
 
-  renderTask(taskItem);
-
   renderNoTasks();
 
+  tasksList.innerHTML = '';
+
+  filter = 'all';
+  activeFilterBtn();
+  filterTasks(filter);
+
+  saveToSessionStorage();
   saveToLocalStorage();
 }
 
-function deleteTask(event) {
-  if (event.target.title !== 'Delete') {
-    return;
-  }
-
-  // get task id
-  const taskElement = event.target.closest('.task-item');
-  const taskId = taskElement.dataset.id;
-
+function deleteTask(taskElement) {
   // get index of task id and task object itself from id hash and tasks list
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
+  const taskIndex = getTaskIndex(taskElement);
+  const taskId = taskElement.dataset.id;
   const idIndex = idHash.findIndex(id => id === taskId);
 
   // if user deletes completed task, update completed task counter
@@ -145,26 +141,17 @@ function deleteTask(event) {
   idHash.splice(idIndex, 1);
   tasks.splice(taskIndex, 1);
 
-  taskElement.remove(); // remove task from page
+  tasksList.removeChild(taskElement);
 
-  taskStats.innerHTML = `Completed: ${completedCount} / ${tasks.length}`; // display stats on page
-
+  updateStats();
   renderNoTasks();
 
   saveToLocalStorage();
 }
 
-function completedTask(event) {
-  if (event.target.dataset.checkbox !== '') {
-    return;
-  }
-
-  // get task id
-  const taskElement = event.target.closest('.task-item');
-  const taskId = taskElement.dataset.id;
-
+function completedTask(taskElement) {
   // find task index in tasks list and change task object's done property
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
+  const taskIndex = getTaskIndex(taskElement);
   tasks[taskIndex].done = !tasks[taskIndex].done;
 
   // get task's dueDate and pick css class depended on time difference between dueDate and today
@@ -190,24 +177,17 @@ function completedTask(event) {
 
   taskText.classList.toggle('completed');
 
-  taskStats.innerHTML = `Completed: ${completedCount} / ${tasks.length}`; // display stats on page
+  tasksList.innerHTML = '';
+  filterTasks(filter);
 
   saveToLocalStorage();
 }
 
-function editTask(event) {
-  if (event.target.title !== 'Edit') {
-    return;
-  }
-
+function editTask(taskElement) {
   editingTask = true; // turn on editing mode
 
-  // get task id
-  const taskElement = event.target.closest('.task-item');
-  const taskId = taskElement.dataset.id;
-
   // find task object in tasks list by its id
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
+  const taskIndex = getTaskIndex(taskElement);
   const taskObj = tasks[taskIndex];
 
   // display task text on input element
@@ -240,21 +220,56 @@ function editTask(event) {
 
 function renderNoTasks() {
   // hide No-Tasks card if there is at least one task in tasks list
-  if (tasksList.children.length >= 1) {
-    noTasks.classList.add('hidden');
-  } else {
-    noTasks.classList.remove('hidden'); // show it if no tasks
+  let noTaskCard = document.querySelector('#no-tasks');
+  if (!noTaskCard) {
+    noTaskCard = document.createElement('div');
+    noTaskCard.setAttribute('id', 'no-tasks');
+    noTaskCard.classList.add('empty-card');
+    noTaskCard.innerHTML = `
+        <div class="empty-illustration">📦</div>
+        <h2 class="empty-title">No tasks yet!</h2>
+        <p class="empty-text">Add something to organize your day.</p>
+        `;
+    document
+      .querySelector('.container')
+      .insertBefore(noTaskCard, document.querySelector('#task-list'));
   }
+  let cardEmoji, cardTitle, cardDesc;
+
+  switch (filter) {
+    case 'all':
+      cardEmoji = '📦';
+      cardTitle = 'No Tasks Yet!';
+      cardDesc = 'Add something to organize your day.';
+      break;
+    case 'active':
+      cardEmoji = '🧘‍♀️';
+      cardTitle = "You're all caught up!";
+      cardDesc = 'No active tasks — take a break or add something new.';
+      break;
+    case 'completed':
+      cardEmoji = '💪';
+      cardTitle = 'Nothing checked off yet';
+      cardDesc = 'Complete a task to see your progress here.';
+  }
+
+  noTaskCard.querySelector('.empty-illustration').innerHTML = cardEmoji;
+  noTaskCard.querySelector('.empty-title').innerHTML = cardTitle;
+  noTaskCard.querySelector('.empty-text').innerHTML = cardDesc;
+
+  tasksList.children.length >= 1
+    ? noTaskCard.classList.add('hidden')
+    : noTaskCard.classList.remove('hidden');
 }
 
 function renderTask(task) {
   // get task's dueDate
   const dueDate = new Date(task.dueDate);
-
-  // split date into individual pieces
-  const dueDateMonth = months[dueDate.getMonth()];
-  const dueDateDay = dueDate.getDate();
-  const dueDateYear = dueDate.getFullYear();
+  const formatedDueDate = dueDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   // pick css styles depened on task's done property
   const taskDoneCssClass = task.done ? 'task-text completed' : 'task-text';
@@ -268,7 +283,7 @@ function renderTask(task) {
             <span class="${taskDoneCssClass}">${task.text}</span>
           </div>
           <div class="task-right">
-            <span class="task-date ${dueDateCssClass}">Due: ${dueDateMonth} ${dueDateDay} ${dueDateYear}</span>
+            <span class="task-date ${dueDateCssClass}">Due: ${formatedDueDate}</span>
             <div class="task-actions">
               <button class="edit-btn" title="Edit">✏️</button>
               <button class="delete-btn" title="Delete">🗑️</button>
@@ -288,7 +303,7 @@ function renderTask(task) {
 
   taskElementCheckbox.checked = task.done; // set checkbox's state depended on task's done property
 
-  taskStats.innerHTML = `Completed: ${completedCount} / ${tasks.length}`; // display stats on page
+  updateStats();
 
   saveToLocalStorage();
 }
@@ -297,7 +312,7 @@ function generateId() {
   // simple function that generates and returns id(10 char string with letters and numbers)
   let id = '';
   for (let i = 0; i < 10; i++) {
-    id += chars[Math.floor(Math.random() * chars.length)];
+    id += CHARS[Math.floor(Math.random() * CHARS.length)];
   }
   return id;
 }
@@ -321,21 +336,14 @@ function dueDateClass(dueDate) {
   }
 }
 
-function saveToLocalStorage() {
-  // save app variables in local storage
-  localStorage.setItem('filter', filter);
-  localStorage.setItem('theme', JSON.stringify(theme));
-  localStorage.setItem('idHash', JSON.stringify(idHash));
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  localStorage.setItem('compledetCount', JSON.stringify(completedCount));
+function updateStats() {
+  taskStats.innerHTML = `Completed: ${completedCount} / ${tasks.length}`;
 }
 
 function toggleTheme() {
-  if (themeBtn.innerHTML === '🌞') {
-    themeBtn.innerHTML = '🌙';
-  } else {
-    themeBtn.innerHTML = '🌞';
-  }
+  themeBtn.innerHTML === '🌞'
+    ? (themeBtn.innerHTML = '🌙')
+    : (themeBtn.innerHTML = '🌞');
 
   document.querySelector('body').classList.toggle('dark');
 
@@ -343,7 +351,16 @@ function toggleTheme() {
   saveToLocalStorage();
 }
 
+function getTaskIndex(taskElement) {
+  const taskId = taskElement.dataset.id;
+  return tasks.findIndex(task => task.id === taskId);
+}
+
 function activeFilterBtn() {
+  filterBtns.forEach(btn => {
+    btn.classList.remove('active');
+  });
+
   const filterBtn = document.querySelector(`button[data-filter="${filter}"`);
   filterBtn.classList.add('active');
 
@@ -354,14 +371,12 @@ function activeFilterBtn() {
       });
 
       filterBtn.classList.add('active');
+      filter = filterBtn.dataset.filter;
 
       tasksList.innerHTML = '';
 
-      filter = filterBtn.dataset.filter;
-
       filterTasks(filter);
-      renderNoTasks();
-      saveToLocalStorage();
+      saveToSessionStorage();
     })
   );
 }
@@ -374,4 +389,17 @@ function filterTasks(currentFilter) {
   });
 
   filteredTasks.forEach(filteredTask => renderTask(filteredTask));
+  renderNoTasks();
+  updateStats();
+}
+
+function saveToLocalStorage() {
+  // save app variables in local storage
+  localStorage.setItem('theme', JSON.stringify(theme));
+  localStorage.setItem('idHash', JSON.stringify(idHash));
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function saveToSessionStorage() {
+  sessionStorage.setItem('filter', filter);
 }
