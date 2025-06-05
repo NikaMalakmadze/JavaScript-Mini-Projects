@@ -30,8 +30,11 @@ const inputText = document.querySelector('#task-input');
 const inputDueDate = document.querySelector('#due-date');
 const addTaskBtn = document.querySelector('#add-task-btn');
 const themeBtn = document.querySelector('#theme-toggle');
-const filterSection = document.querySelector('.filters');
-const filterBtns = document.querySelectorAll('.filter');
+const filterBtns = document.querySelectorAll('.category-btn');
+const addTaskModal = document.querySelector('#taskModal');
+const addTaskModalContent = document.querySelector('#taskModal-content');
+const addTaskModalCloseBtn = document.querySelector('#taskModal-close');
+const addTaskModalOpenBtn = document.querySelector('#taskModal-open');
 
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
 let filter = sessionStorage.getItem('filter') ?? 'all';
@@ -66,11 +69,21 @@ function initApp() {
 function addEvenetListeners() {
   form.addEventListener('submit', addTask);
 
-  filterSection.addEventListener('click', filterTasks);
-
   themeBtn.addEventListener('click', toggleTheme);
 
   tasksList.addEventListener('click', handleClick);
+
+  addTaskModalOpenBtn.addEventListener('click', addTaskModalControl);
+  addTaskModalCloseBtn.addEventListener('click', addTaskModalControl);
+  addTaskModal.addEventListener('click', addTaskModalControl);
+  addTaskModalContent.addEventListener('click', element =>
+    element.stopPropagation()
+  );
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && addTaskModal.classList.contains('active')) {
+      addTaskModalControl();
+    }
+  });
 }
 
 function handleClick(event) {
@@ -86,11 +99,16 @@ function handleClick(event) {
   }
 }
 
+function addTaskModalControl() {
+  addTaskModal.classList.toggle('active');
+}
+
 function addTask(event) {
   if (editingTask) return; // dont add new task if user is editing task
 
   // cancel page reloading on form submit
   event.preventDefault();
+  addTaskModalControl();
 
   // get task text
   const taskText = inputText.value;
@@ -203,6 +221,8 @@ function editTask(taskElement) {
   inputDueDate.value = dueDate.split('T')[0];
 
   addTaskBtn.innerHTML = '✏️';
+
+  addTaskModalControl();
 
   // when user clicks on sumbit button
   addTaskBtn.addEventListener('click', function () {

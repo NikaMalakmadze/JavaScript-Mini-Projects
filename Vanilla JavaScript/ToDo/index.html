@@ -12,36 +12,98 @@
     />
   </head>
   <body>
-    <div class="container">
-      <header>
-        <h1>ToDoTasks</h1>
-        <button id="theme-toggle" title="Toggle Theme">🌙</button>
-      </header>
+    <div class="app-layout">
+      <aside class="sidebar sidebar__left">
+        <h2 class="sidebar-title">Status</h2>
+        <div class="category-section">
+          <button class="category-btn active" data-filter="all">All</button>
+          <button class="category-btn" data-filter="active">Active</button>
+          <button class="category-btn" data-filter="completed">
+            Completed
+          </button>
+        </div>
 
-      <form class="add-task" id="form">
-        <input
-          type="text"
-          id="task-input"
-          placeholder="Add a new task..."
-          required
-        />
-        <input type="date" id="due-date" required />
-        <button id="add-task-btn">➕</button>
-      </form>
+        <div class="sidebar-custom">
+          <h2>Categories</h2>
+          <button class="add-category">＋</button>
+        </div>
 
-      <section class="filters">
-        <button class="filter" data-filter="all">All</button>
-        <button class="filter" data-filter="active">Active</button>
-        <button class="filter" data-filter="completed">Completed</button>
-      </section>
+        <div class="custom-categories">
+          <div class="empty-card">
+            <div class="empty-illustration">🛠️</div>
+            <h2 class="empty-title">In Development</h2>
+            <p class="empty-text">
+              This feature is currently under construction.
+            </p>
+          </div>
+          <!-- <div class="category-chip">
+            Work
+            <span class="delete-category">✕</span>
+          </div>
+          <div class="category-chip">
+            Work
+            <span class="delete-category">✕</span>
+          </div>
+          <div class="category-chip">
+            W
+            <span class="delete-category">✕</span>
+          </div> -->
+        </div>
+      </aside>
+      <div class="main-content">
+        <div class="container">
+          <header>
+            <div class="header__title">
+              <h1>ToDoTasks</h1>
+              <button id="theme-toggle" title="Toggle Theme">🌙</button>
+            </div>
+            <div class="quote-card">
+              <div class="quote-icon">💬</div>
+              <blockquote class="quote-text">
+                "The secret of getting ahead is getting started."
+              </blockquote>
+              <cite class="quote-author">– Mark Twain</cite>
+            </div>
+          </header>
 
-      <ul id="task-list" class="task-list">
-        <!-- Tasks will be dynamically inserted here -->
-      </ul>
+          <ul id="task-list" class="task-list">
+            <!-- Tasks will be dynamically inserted here -->
+          </ul>
 
-      <footer>
-        <p id="task-stats">Completed: 0 / 0</p>
-      </footer>
+          <footer>
+            <p id="task-stats">Completed: 0 / 0</p>
+          </footer>
+        </div>
+      </div>
+      <aside class="sidebar sidebar__right">
+        <div class="empty-card">
+          <div class="empty-illustration">🛠️</div>
+          <h2 class="empty-title">In Development</h2>
+          <p class="empty-text">
+            This feature is currently under construction.
+          </p>
+        </div>
+        <button class="add-task-btn" id="taskModal-open">＋ Add Task</button>
+      </aside>
+    </div>
+    <div class="modals">
+      <div class="modal-overlay" id="taskModal">
+        <div class="modal-content" id="taskModal-content">
+          <button class="modal-close" id="taskModal-close">✕</button>
+          <h2 class="modal-title">Add New Task</h2>
+
+          <form class="modal-form" id="form">
+            <input
+              type="text"
+              id="task-input"
+              placeholder="Task title..."
+              required
+            />
+            <input type="date" id="due-date" required />
+            <button id="add-task-btn" type="submit">Add Task</button>
+          </form>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
