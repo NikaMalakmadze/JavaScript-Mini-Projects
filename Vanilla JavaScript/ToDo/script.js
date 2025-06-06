@@ -32,9 +32,18 @@ const addTaskBtn = document.querySelector('#add-task-btn');
 const themeBtn = document.querySelector('#theme-toggle');
 const filterBtns = document.querySelectorAll('.category-btn');
 const addTaskModal = document.querySelector('#taskModal');
-const addTaskModalContent = document.querySelector('#taskModal-content');
-const addTaskModalCloseBtn = document.querySelector('#taskModal-close');
-const addTaskModalOpenBtn = document.querySelector('#taskModal-open');
+const customCategoriesList = document.querySelector('.custom-categories');
+const addCategoryModal = document.querySelector('#categoryModal');
+const addCategoryForm = document.querySelector('#addCategoryForm');
+const categoryInput = document.querySelector('#category-name');
+const categoryWarning = document.querySelector('.category-warning');
+const colorInput = document.getElementById('category-color');
+const colorPreview = document.querySelector('.color-preview');
+const customCategories = document.querySelectorAll('.category-chip');
+const customSelect = document.getElementById('customSelect');
+const selectOptions = document.getElementById('selectOptions');
+const selectedOption = document.getElementById('selectedOption');
+const selectedCategoryInput = document.getElementById('selectedCategory');
 
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
 let filter = sessionStorage.getItem('filter') ?? 'all';
@@ -43,6 +52,8 @@ let tasks = []; // keep all task objects in a list
 let completedCount = 0; // variable to track amount of completed tasks
 let editingTask = false; // needed for form to decide whenever it has to add new task or change exsisting one
 let theme;
+
+let categories = [];
 
 initApp();
 addEvenetListeners();
@@ -61,32 +72,43 @@ function initApp() {
     completedCount = tasks.filter(task => task.done).length;
   }
 
+  if (localStorage.getItem('categories')) {
+    categories = JSON.parse(localStorage.getItem('categories'));
+    categories.forEach(category => {
+      renderCategory(category);
+      updateSelectCategory(category);
+    });
+  }
+
+  renderNoCategory();
+
   tasksList.innerHTML = '';
   activeFilterBtn();
   filterTasks(filter);
+
+  ModalControl(addTaskModal);
+  ModalControl(addCategoryModal);
+
+  chooseCategory();
 }
 
 function addEvenetListeners() {
   form.addEventListener('submit', addTask);
 
+  customCategoriesList.addEventListener('click', handleCategoryClick);
+
+  addCategoryForm.addEventListener('submit', addCategory);
+
   themeBtn.addEventListener('click', toggleTheme);
 
-  tasksList.addEventListener('click', handleClick);
+  tasksList.addEventListener('click', handleTaskListClick);
 
-  addTaskModalOpenBtn.addEventListener('click', addTaskModalControl);
-  addTaskModalCloseBtn.addEventListener('click', addTaskModalControl);
-  addTaskModal.addEventListener('click', addTaskModalControl);
-  addTaskModalContent.addEventListener('click', element =>
-    element.stopPropagation()
-  );
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && addTaskModal.classList.contains('active')) {
-      addTaskModalControl();
-    }
+  colorInput.addEventListener('input', () => {
+    colorPreview.style.backgroundColor = colorInput.value;
   });
 }
 
-function handleClick(event) {
+function handleTaskListClick(event) {
   const taskElement = event.target.closest('.task-item');
   if (!taskElement) return;
 
@@ -99,8 +121,177 @@ function handleClick(event) {
   }
 }
 
-function addTaskModalControl() {
-  addTaskModal.classList.toggle('active');
+function handleCategoryClick(event) {
+  if (event.target.title === 'Delete-Category') {
+    deleteCategory(event.target.closest('.category-chip'));
+  } else if (event.target.classList.contains('category-chip')) {
+    customFilterTasks(event.target.dataset.category);
+  }
+}
+
+function deleteCategory(categoryElement) {
+  const categoryName = categoryElement.dataset.category;
+  const categoryIndex = categories.indexOf(
+    category => category.name === categoryName
+  );
+  categories.splice(categoryIndex, 1);
+
+  customCategoriesList.removeChild(categoryElement);
+  const selectCategoryElement = customSelect.querySelector(
+    `[data-value="${categoryName}"]`
+  );
+  selectOptions.removeChild(selectCategoryElement);
+
+  if (selectedOption.textContent.toLocaleLowerCase() === categoryName) {
+    selectedOption.textContent = 'Choose category';
+  }
+
+  const categoryTasks = tasks.filter(task => task.category === categoryName);
+  categoryTasks.forEach(task => {
+    deleteTask(document.querySelector(`[data-id="${task.id}"]`));
+  });
+
+  renderNoCategory();
+  saveToLocalStorage();
+}
+
+function ModalControl(modal) {
+  const modalId = modal.id;
+  const openBtn = document.getElementById(`${modalId}-open`);
+  const closeBtn = document.getElementById(`${modalId}-close`);
+  const modalContent = document.getElementById(`${modalId}-content`);
+
+  modal.addEventListener('click', () => toggleModal(modalId));
+  openBtn.addEventListener('click', () => toggleModal(modalId));
+  closeBtn.addEventListener('click', () => toggleModal(modalId));
+  modalContent.addEventListener('click', element => element.stopPropagation());
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && modal.classList.contains('active')) {
+      toggleModal(modalId);
+    }
+  });
+}
+
+function toggleModal(modalId) {
+  document.getElementById(modalId).classList.toggle('active');
+}
+
+function chooseCategory() {
+  customSelect.addEventListener('click', () => {
+    selectOptions.classList.toggle('hidden');
+  });
+
+  selectOptions.addEventListener('click', e => {
+    if (e.target.tagName === 'LI') {
+      selectedOption.textContent = e.target.textContent;
+      selectedCategoryInput.value = e.target.dataset.value;
+      selectOptions.classList.add('hidden');
+    }
+  });
+
+  document.querySelector('#taskModal-content').addEventListener('click', e => {
+    if (e.target !== customSelect) {
+      selectOptions.classList.add('hidden');
+    }
+  });
+
+  document
+    .querySelector('#taskModal')
+    .addEventListener('click', () => selectOptions.classList.add('hidden'));
+}
+
+function customFilterTasks(category) {
+  tasksList.innerHTML = '';
+  const filteredTasksByStatus = tasks.filter(task => {
+    if (filter === 'active') return !task.done;
+    if (filter === 'completed') return task.done;
+    if (filter === 'all') return true; // "all"
+  });
+  const filteredByCategory = filteredTasksByStatus.filter(
+    task => task.category === category
+  );
+  renderTasks(filteredByCategory);
+}
+
+function addCategory(event) {
+  // cancel page reloading on form submit
+  event.preventDefault();
+
+  const categoryName = categoryInput.value.trim().toLowerCase();
+  if (categories.includes(categoryName)) {
+    categoryWarning.textContent = `Category "${categoryName}" already exists.`;
+    categoryWarning.classList.remove('hidden');
+    return;
+  } else {
+    categoryWarning.textContent = '';
+    categoryWarning.style.display = 'none';
+  }
+
+  const categoryColor = colorInput.value;
+
+  toggleModal(addCategoryModal.id);
+
+  const categoryItem = {
+    name: categoryName,
+    color: categoryColor,
+  };
+
+  categories.push(categoryItem);
+
+  updateSelectCategory(categoryItem);
+  renderCategory(categoryItem);
+  renderNoCategory();
+
+  saveToLocalStorage();
+}
+
+function updateSelectCategory(categoryItem) {
+  const selectCategoryLayout = `
+    <li data-value="${categoryItem.name}">${capitalize(categoryItem.name)}</li>
+  `;
+
+  selectOptions.insertAdjacentHTML('beforeend', selectCategoryLayout);
+}
+
+function renderCategory(category) {
+  const categoryLayout = `
+    <div class="category-chip" data-category="${
+      category.name
+    }" style="background-color: ${category.color}75">
+      ${capitalize(category.name)}
+      <span class="delete-category" title="Delete-Category">✕</span>
+    </div>`;
+
+  customCategoriesList.insertAdjacentHTML('beforeend', categoryLayout);
+}
+
+function renderNoCategory() {
+  let noCategoryCard = document.querySelector('#no-custom-categories');
+  if (!noCategoryCard) {
+    noCategoryCard = document.createElement('div');
+    noCategoryCard.setAttribute('id', 'no-custom-categories');
+    noCategoryCard.classList.add('empty-card');
+    noCategoryCard.innerHTML = `
+        <div class="empty-illustration">🗂️</div>
+        <h2 class="empty-title">No custom categories</h2>
+        <p class="empty-text">Create your own to organize tasks the way you want.</p>
+        `;
+    document
+      .querySelector('.sidebar__left')
+      .insertBefore(
+        noCategoryCard,
+        document.querySelector('.custom-categories')
+      );
+  }
+
+  customCategoriesList.children.length >= 1
+    ? noCategoryCard.classList.add('hidden')
+    : noCategoryCard.classList.remove('hidden');
+}
+
+function capitalize(str) {
+  return String(str).charAt(0).toUpperCase() + String(str).slice(1);
 }
 
 function addTask(event) {
@@ -108,13 +299,24 @@ function addTask(event) {
 
   // cancel page reloading on form submit
   event.preventDefault();
-  addTaskModalControl();
+  toggleModal(addTaskModal.id);
 
   // get task text
   const taskText = inputText.value;
 
   // get task due date and convert it to more comfortable format
   const dueDate = new Date(inputDueDate.value);
+
+  let taskCategory = selectedCategoryInput.value;
+  let taskColor;
+  if (!taskCategory || taskCategory === 'None') {
+    taskCategory = 'default';
+  } else {
+    const categoryIndex = categories.findIndex(
+      category => category.name === taskCategory
+    );
+    taskColor = categories[categoryIndex].color;
+  }
 
   // generate unique id
   let taskId = generateId();
@@ -126,7 +328,9 @@ function addTask(event) {
   const taskItem = {
     id: taskId,
     text: taskText,
+    category: taskCategory,
     dueDate: dueDate,
+    color: taskColor,
     done: false,
   };
 
@@ -222,7 +426,7 @@ function editTask(taskElement) {
 
   addTaskBtn.innerHTML = '✏️';
 
-  addTaskModalControl();
+  toggleModal(addTaskModal.id);
 
   // when user clicks on sumbit button
   addTaskBtn.addEventListener('click', function () {
@@ -297,7 +501,8 @@ function renderTask(task) {
 
   // create task layout
   const taskLayout = `
-          <li class="task-item" data-id="${task.id}">
+          <li class="task-item" data-id="${task.id}" 
+          ${task.color ? `style="background-color: ${task.color}75"` : ''}>
           <div class="task-left">
             <input type="checkbox" class="task-check" data-checkbox />
             <span class="${taskDoneCssClass}">${task.text}</span>
@@ -376,6 +581,12 @@ function getTaskIndex(taskElement) {
   return tasks.findIndex(task => task.id === taskId);
 }
 
+function renderTasks(filteredTasks) {
+  filteredTasks.forEach(filteredTask => renderTask(filteredTask));
+  renderNoTasks();
+  updateStats();
+}
+
 function activeFilterBtn() {
   filterBtns.forEach(btn => {
     btn.classList.remove('active');
@@ -407,10 +618,7 @@ function filterTasks(currentFilter) {
     if (currentFilter === 'completed') return task.done;
     if (currentFilter === 'all') return true; // "all"
   });
-
-  filteredTasks.forEach(filteredTask => renderTask(filteredTask));
-  renderNoTasks();
-  updateStats();
+  renderTasks(filteredTasks);
 }
 
 function saveToLocalStorage() {
@@ -418,6 +626,7 @@ function saveToLocalStorage() {
   localStorage.setItem('theme', JSON.stringify(theme));
   localStorage.setItem('idHash', JSON.stringify(idHash));
   localStorage.setItem('tasks', JSON.stringify(tasks));
+  localStorage.setItem('categories', JSON.stringify(categories));
 }
 
 function saveToSessionStorage() {

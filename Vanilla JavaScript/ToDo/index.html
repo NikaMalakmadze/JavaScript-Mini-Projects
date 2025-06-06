@@ -25,29 +25,11 @@
 
         <div class="sidebar-custom">
           <h2>Categories</h2>
-          <button class="add-category">＋</button>
+          <button class="add-category" id="categoryModal-open">＋</button>
         </div>
 
         <div class="custom-categories">
-          <div class="empty-card">
-            <div class="empty-illustration">🛠️</div>
-            <h2 class="empty-title">In Development</h2>
-            <p class="empty-text">
-              This feature is currently under construction.
-            </p>
-          </div>
-          <!-- <div class="category-chip">
-            Work
-            <span class="delete-category">✕</span>
-          </div>
-          <div class="category-chip">
-            Work
-            <span class="delete-category">✕</span>
-          </div>
-          <div class="category-chip">
-            W
-            <span class="delete-category">✕</span>
-          </div> -->
+          <!-- Custom Categories will be dynamically inserted here -->
         </div>
       </aside>
       <div class="main-content">
@@ -100,7 +82,46 @@
               required
             />
             <input type="date" id="due-date" required />
+            <div class="custom-select-wrapper">
+              <div class="custom-select" id="customSelect">
+                <span class="selected-option" id="selectedOption"
+                  >Choose category</span
+                >
+                <ul class="select-options hidden" id="selectOptions">
+                  <li data-value="None">None</li>
+                  <!-- Add dynamically generated categories here -->
+                </ul>
+              </div>
+            </div>
+            <input type="hidden" id="selectedCategory" name="category" />
             <button id="add-task-btn" type="submit">Add Task</button>
+          </form>
+        </div>
+      </div>
+      <div class="modal-overlay" id="categoryModal">
+        <div class="modal" id="categoryModal-content">
+          <div class="modal-header">
+            <h2>Add New Category</h2>
+            <button class="close-modal" id="categoryModal-close">✕</button>
+          </div>
+          <form id="addCategoryForm" class="modal-form">
+            <label for="category-name">Category Name</label>
+            <div class="input-category-wrapper">
+              <input
+                type="text"
+                id="category-name"
+                name="category-name"
+                placeholder="e.g. Design, School..."
+                required
+              />
+              <p class="category-warning hidden"></p>
+            </div>
+            <label for="category-color">Pick a Color</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="category-color" value="#3b82f6" />
+              <span class="color-preview"></span>
+            </div>
+            <button type="submit" class="submit-btn">Add Category</button>
           </form>
         </div>
       </div>
