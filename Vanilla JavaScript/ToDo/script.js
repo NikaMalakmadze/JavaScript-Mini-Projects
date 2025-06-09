@@ -20,6 +20,8 @@ const MONTHS = [
   'December',
 ];
 
+const API_URL = 'https://dummyjson.com/quotes/random';
+
 // find and get needed elements
 
 const tasksList = document.querySelector('#task-list');
@@ -44,6 +46,10 @@ const customSelect = document.getElementById('customSelect');
 const selectOptions = document.getElementById('selectOptions');
 const selectedOption = document.getElementById('selectedOption');
 const selectedCategoryInput = document.getElementById('selectedCategory');
+const quoteTextElement = document.querySelector('.quote-text');
+const quoteAuthorElement = document.querySelector('.quote-author');
+const quoteCard = document.getElementById('quoteCard');
+const quoteSkeleton = document.getElementById('quoteSkeleton');
 
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
 let filter = sessionStorage.getItem('filter') ?? 'all';
@@ -54,6 +60,8 @@ let editingTask = false; // needed for form to decide whenever it has to add new
 let theme;
 
 let categories = [];
+
+let currentQuote = null;
 
 initApp();
 addEvenetListeners();
@@ -78,6 +86,16 @@ function initApp() {
       renderCategory(category);
       updateSelectCategory(category);
     });
+  }
+
+  if (localStorage.getItem('currentQuote')) {
+    currentQuote = JSON.parse(localStorage.getItem('currentQuote'));
+    const currentQuoteDate = currentQuote.date;
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    currentQuoteDate !== todayDate ? getQuote() : loadCurrentQuote();
+  } else {
+    getQuote();
   }
 
   renderNoCategory();
@@ -621,12 +639,57 @@ function filterTasks(currentFilter) {
   renderTasks(filteredTasks);
 }
 
+function loadCurrentQuote() {
+  quoteTextElement.textContent = `"${currentQuote.text}"`;
+  quoteAuthorElement.textContent = `– ${currentQuote.author}`;
+  quoteSkeleton.style.display = 'none';
+  quoteCard.style.display = 'flex';
+}
+
+async function getQuote() {
+  quoteSkeleton.style.display = 'flex';
+  quoteCard.style.display = 'none';
+
+  async function fetchQuote() {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+    return data;
+  }
+
+  let newQuote = await fetchQuote();
+
+  if (currentQuote !== null) {
+    while (currentQuote.id === newQuote.id) {
+      newQuote = await fetchQuote();
+    }
+  }
+
+  const { id: quoteId, author: quoteAuthor, quote: quoteText } = newQuote;
+  const currentQuoteDate = new Date().toISOString().split('T')[0];
+
+  quoteTextElement.textContent = `"${quoteText}"`;
+  quoteAuthorElement.textContent = `– ${quoteAuthor}`;
+
+  currentQuote = {
+    id: quoteId,
+    author: quoteAuthor,
+    text: quoteText,
+    date: currentQuoteDate,
+  };
+
+  quoteSkeleton.style.display = 'none';
+  quoteCard.style.display = 'flex';
+
+  saveToLocalStorage();
+}
+
 function saveToLocalStorage() {
   // save app variables in local storage
   localStorage.setItem('theme', JSON.stringify(theme));
   localStorage.setItem('idHash', JSON.stringify(idHash));
   localStorage.setItem('tasks', JSON.stringify(tasks));
   localStorage.setItem('categories', JSON.stringify(categories));
+  localStorage.setItem('currentQuote', JSON.stringify(currentQuote));
 }
 
 function saveToSessionStorage() {

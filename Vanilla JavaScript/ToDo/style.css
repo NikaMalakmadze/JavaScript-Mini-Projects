@@ -12,6 +12,14 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
+body:not(.dark) .skeleton-text {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+}
+
+body.dark .skeleton-text {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+}
+
 :root {
   --bg: #ffffff;
   --text: #111;
@@ -185,7 +193,7 @@ body {
   margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .quote-icon {
@@ -202,7 +210,7 @@ body {
 .quote-author {
   font-size: 0.85rem;
   color: #64748b;
-  align-self: flex-end;
+  align-self: flex-start;
 }
 
 .add-task-btn {
@@ -748,6 +756,33 @@ footer {
 
 .modal-form button:hover {
   background-color: #2563eb;
+}
+
+/* Skeleton Loader */
+
+.skeleton-card .skeleton-text {
+  height: 16px;
+  border-radius: 8px;
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-text.short {
+  width: 30%;
+  height: 14px;
+}
+
+.skeleton-text.long {
+  width: 80%;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Animation */
