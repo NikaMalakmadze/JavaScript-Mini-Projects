@@ -50,6 +50,11 @@ const quoteTextElement = document.querySelector('.quote-text');
 const quoteAuthorElement = document.querySelector('.quote-author');
 const quoteCard = document.getElementById('quoteCard');
 const quoteSkeleton = document.getElementById('quoteSkeleton');
+const leftSidebar = document.querySelector('.sidebar__left');
+const rightSidebar = document.querySelector('.sidebar__right');
+const leftSidebarToggle = document.getElementById('leftSidebarToggle');
+const rightSidebarToggle = document.getElementById('rightSidebarToggle');
+const quoteIconElement = document.querySelector('#quoteId');
 
 let idHash = JSON.parse(localStorage.getItem('idHash')) ?? []; // keep id of every task in hash
 let filter = sessionStorage.getItem('filter') ?? 'all';
@@ -124,6 +129,23 @@ function addEvenetListeners() {
   colorInput.addEventListener('input', () => {
     colorPreview.style.backgroundColor = colorInput.value;
   });
+
+  leftSidebarToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    leftSidebar.classList.toggle('open');
+  });
+
+  rightSidebarToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    rightSidebar.classList.toggle('open');
+  });
+
+  document.addEventListener('click', responsiveSidebars);
+
+  quoteIconElement.addEventListener('click', () => {
+    quoteTextElement.classList.toggle('hidden');
+    quoteAuthorElement.classList.toggle('hidden');
+  });
 }
 
 function handleTaskListClick(event) {
@@ -171,6 +193,24 @@ function deleteCategory(categoryElement) {
 
   renderNoCategory();
   saveToLocalStorage();
+}
+
+function responsiveSidebars(event) {
+  const isLeftOpen = leftSidebar.classList.contains('open');
+  const isRightOpen = rightSidebar.classList.contains('open');
+
+  const clickedInsideLeft = leftSidebar.contains(event.target);
+  const clickedInsideRight = rightSidebar.contains(event.target);
+
+  // If left sidebar is open and user clicked outside it
+  if (isLeftOpen && !clickedInsideLeft) {
+    leftSidebar.classList.remove('open');
+  }
+
+  // If right sidebar is open and user clicked outside it
+  if (isRightOpen && !clickedInsideRight) {
+    rightSidebar.classList.remove('open');
+  }
 }
 
 function ModalControl(modal) {
@@ -451,6 +491,17 @@ function editTask(taskElement) {
     // update object's text and dueDate
     taskObj.text = inputText.value;
     taskObj.dueDate = new Date(inputDueDate.value);
+    let taskCategory = selectedCategoryInput.value;
+    if (!taskCategory || taskCategory === 'None') {
+      taskCategory = 'default';
+      taskObj.category = taskCategory;
+      delete taskObj.color;
+    } else {
+      const categoryIndex = categories.findIndex(
+        category => category.name === selectedCategoryInput.value
+      );
+      taskObj.color = categories[categoryIndex].color;
+    }
 
     saveToLocalStorage();
 

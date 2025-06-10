@@ -37,7 +37,18 @@
           <header>
             <div class="header__title">
               <h1>ToDoTasks</h1>
-              <button id="theme-toggle" title="Toggle Theme">🌙</button>
+
+              <div class="header__controls">
+                <div class="sidebar-btn-wrapper">
+                  <button id="leftSidebarToggle" class="sidebar-toggle-btn">
+                    ☰ <span class="btn-text">Categories</span>
+                  </button>
+                  <button id="rightSidebarToggle" class="sidebar-toggle-btn">
+                    📋 <span class="btn-text">Tasks</span>
+                  </button>
+                </div>
+                <button id="theme-toggle" title="Toggle Theme">🌙</button>
+              </div>
             </div>
 
             <!-- Skeleton Loader -->
@@ -48,11 +59,11 @@
             </div>
 
             <div class="quote-card" id="quoteCard">
-              <div class="quote-icon">💬</div>
-              <blockquote class="quote-text">
+              <div class="quote-icon" id="quoteId">💬</div>
+              <blockquote class="quote-text fade show">
                 "The secret of getting ahead is getting started."
               </blockquote>
-              <cite class="quote-author">– Mark Twain</cite>
+              <cite class="quote-author fade show">– Mark Twain</cite>
             </div>
           </header>
 
